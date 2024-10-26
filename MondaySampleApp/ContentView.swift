@@ -38,6 +38,17 @@ struct ContentView: View {
             .padding(.horizontal, 16)
         }
         .navigationTitle("投稿リスト")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    Task {
+                        await vm.didTapDeleteAccount()
+                    }
+                } label: {
+                    Text("アカウント削除")
+                }
+            }
+        }
     }
 }
 
@@ -64,19 +75,21 @@ struct PostCellView<VM: ContentViewModel>: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                Menu {
-                    Button("編集") {
-                        isEditing = true
-                        editMessage = viewData.message
-                    }
-                    Button("削除", role: .destructive) {
-                        Task {
-                            await vm.didTapDeleteButton(id: viewData.id)
+                if viewData.shouldShowMenu {
+                    Menu {
+                        Button("編集") {
+                            isEditing = true
+                            editMessage = viewData.message
                         }
+                        Button("削除", role: .destructive) {
+                            Task {
+                                await vm.didTapDeleteButton(id: viewData.id)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .foregroundColor(.gray)
                     }
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .foregroundColor(.gray)
                 }
             }
             if isEditing {
@@ -93,8 +106,4 @@ struct PostCellView<VM: ContentViewModel>: View {
         .padding(16)
         .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
     }
-}
-
-#Preview {
-    ContentView()
 }

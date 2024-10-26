@@ -1,10 +1,13 @@
 import FirebaseFirestore
+import FirebaseAuth
 
 final class FirebaseManager {
     static let shared = FirebaseManager()
     private let db = Firestore.firestore()
     private init() {}
 }
+
+// MARK: Firestore
 
 extension FirebaseManager {
     /// Create
@@ -43,5 +46,28 @@ extension FirebaseManager {
             .collection("posts")
             .document(id)
             .delete()
+    }
+}
+
+// MARK: FireAuth
+
+extension FirebaseManager {
+    func signIn() async throws {
+        _ = try await Auth.auth().signInAnonymously()
+    }
+
+    func getAuthUid() -> String? {
+        Auth.auth().currentUser?.uid
+    }
+
+    func deleteAccount() async throws {
+        // アカウント削除
+        try await Auth.auth().currentUser?.delete()
+        // サインアウト
+        try Auth.auth().signOut()
+        // アプリ内保存全削除
+        if let appDomain = Bundle.main.bundleIdentifier {
+            UserDefaults.standard.removePersistentDomain(forName: appDomain)
+        }
     }
 }

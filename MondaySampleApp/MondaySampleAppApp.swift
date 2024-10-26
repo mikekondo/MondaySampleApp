@@ -13,11 +13,16 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct MondaySampleAppApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    
+    @StateObject var vm = SignInViewModelImpl()
+
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                ContentView()
+                if vm.alreadyRegisterUserName {
+                    ContentView()
+                } else {
+                    SignInScreenView(vm: vm)
+             }
             }
         }
     }

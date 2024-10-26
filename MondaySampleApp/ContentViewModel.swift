@@ -4,7 +4,7 @@ import Foundation
     // life cycle
     func viewDidAppear() async
 
-    // view logic
+    // view logic    
     var message: String { get }
     var viewDataList: [ContentViewData] { get }
 
@@ -12,12 +12,14 @@ import Foundation
     func didTapPostButton() async
     func didTapDeleteButton(id: String) async
     func didTapEditDoneButton(id: String, message: String) async
+    func didTapDeleteAccount() async
 }
 
 struct ContentViewData: Identifiable, Equatable {
     let id: String
     let message: String
     let userNameText: String
+    let shouldShowMenu: Bool
 }
 
 final class ContentViewModelImpl: ContentViewModel {
@@ -59,21 +61,23 @@ extension ContentViewModelImpl {
     }
 
     private func makeViewData(_ post: Post) -> ContentViewData {
-        .init(
+        let userName = UserDefaults.standard.object(forKey: "userName") as? String ?? ""
+        return .init(
             id: post.id ?? UUID().uuidString,
             message: post.message,
-            userNameText: post.userName + "さんの投稿"
+            userNameText: post.userName + "さんの投稿",
+            shouldShowMenu: post.userName == userName
         )
     }
 }
-
 
 // MARK: tap logic
 
 extension ContentViewModelImpl {
     func didTapPostButton() async {
+        guard let userName = UserDefaults.standard.object(forKey: "userName") as? String else { return}
         do {
-            try firebaseManager.createPost(post: .init(userName: "mike", message: message))
+            try firebaseManager.createPost(post: .init(userName: userName, message: message))
             message = ""
             await fetchPostList()
         } catch {
@@ -97,5 +101,9 @@ extension ContentViewModelImpl {
         case .failure, .none:
             return
         }
+    }
+
+    func didTapDeleteAccount() async {
+        try? await firebaseManager.deleteAccount()
     }
 }
