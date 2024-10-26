@@ -12,9 +12,13 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct MondaySampleAppApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationStack {
+                ContentView()
+            }
         }
     }
 }

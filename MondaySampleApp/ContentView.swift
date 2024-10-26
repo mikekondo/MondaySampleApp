@@ -1,19 +1,93 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var vm = ContentViewModelImpl()
+
     var body: some View {
         ScrollView {
-            VStack(spacing: 0) {
-
+            VStack(spacing: 12) {
+                ForEach(vm.viewDataList) { viewData in
+                    PostCellView(vm: vm, viewData: viewData)
+                }
+                .animation(.default, value: vm.viewDataList)
+            }
+            .padding(.horizontal, 16)
+        }
+        .onAppear {
+            Task {
+                await vm.viewDidAppear()
             }
         }
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        .safeAreaInset(edge: .bottom) {
+            HStack(spacing: 8) {
+                TextField("メッセージを入力", text: $vm.message)
+                    .textFieldStyle(.roundedBorder)
+                    .padding(.vertical, 8)
+                Button(action: {
+                    Task {
+                        await vm.didTapPostButton()
+                    }
+                }) {
+                    Text("投稿")
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.blue, in: RoundedRectangle(cornerRadius: 8))
+                }
+            }
+            .padding(.horizontal, 16)
         }
-        .padding()
+        .navigationTitle("投稿リスト")
+    }
+}
+
+struct PostCellView<VM: ContentViewModel>: View {
+    @State private var isEditing = false
+    @State private var editMessage = ""
+    @ObservedObject var vm: VM
+    let viewData: ContentViewData
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 16) {
+                if isEditing {
+                    TextField("編集内容を入力", text: $editMessage)
+                        .textFieldStyle(.roundedBorder)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                } else {
+                    Text(viewData.message)
+                        .font(.body)
+                        .padding(.vertical, 8)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                Menu {
+                    Button("編集") {
+                        isEditing = true
+                        editMessage = viewData.message
+                    }
+                    Button("削除", role: .destructive) {
+                        Task {
+                            await vm.didTapDeleteButton(id: viewData.id)
+                        }
+                    }
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .foregroundColor(.gray)
+                }
+            }
+            if isEditing {
+                Button("完了") {
+                    Task {
+                        await vm.didTapEditDoneButton(id: viewData.id, message: editMessage)
+                        isEditing = false
+                    }
+                }
+                .padding(.top, 4)
+                .foregroundColor(.blue)
+            }
+        }
+        .padding(16)
+        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
     }
 }
 
