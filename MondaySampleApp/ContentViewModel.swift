@@ -5,11 +5,8 @@ import Foundation
     func viewDidAppear() async
 
     // view logic
-    var message: String { get set }
-    var editMessage: String { get set }
-    var isEditing: Bool { get set }
+    var message: String { get }
     var viewDataList: [ContentViewData] { get }
-    var viewType: ContentViewType { get }
 
     // tap logic
     func didTapPostButton() async
@@ -17,20 +14,14 @@ import Foundation
     func didTapEditDoneButton(id: String, message: String) async
 }
 
-enum ContentViewType {
-    case normal
-    case edit
-}
-
 struct ContentViewData: Identifiable, Equatable {
     let id: String
     let message: String
+    let userNameText: String
 }
 
 final class ContentViewModelImpl: ContentViewModel {
     @Published var message: String = ""
-    @Published var isEditing: Bool = false
-    @Published var editMessage: String = ""
     @Published var postListResponse: Result<[Post], Error>?
     let firebaseManager = FirebaseManager.shared
 }
@@ -70,12 +61,9 @@ extension ContentViewModelImpl {
     private func makeViewData(_ post: Post) -> ContentViewData {
         .init(
             id: post.id ?? UUID().uuidString,
-            message: post.message
+            message: post.message,
+            userNameText: post.userName + "さんの投稿"
         )
-    }
-
-    var viewType: ContentViewType {
-        isEditing ? .edit : .normal
     }
 }
 

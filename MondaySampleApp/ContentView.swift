@@ -55,10 +55,14 @@ struct PostCellView<VM: ContentViewModel>: View {
                         .textFieldStyle(.roundedBorder)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 } else {
-                    Text(viewData.message)
-                        .font(.body)
-                        .padding(.vertical, 8)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(viewData.userNameText)
+                            .font(.body.bold())
+                        Text(viewData.message)
+                            .font(.body)
+                            .padding(.vertical, 8)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 Menu {
                     Button("編集") {
