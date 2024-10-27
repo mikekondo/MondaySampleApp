@@ -71,7 +71,9 @@ struct PostCellView<VM: ContentViewModel>: View {
                             .font(.body.bold())
                         Text(viewData.message)
                             .font(.body)
-                            .padding(.vertical, 8)
+                        Text(viewData.dateText)
+                            .font(.caption)
+                            .foregroundStyle(Color.gray)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }

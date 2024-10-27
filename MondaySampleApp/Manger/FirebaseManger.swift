@@ -47,6 +47,14 @@ extension FirebaseManager {
             .document(id)
             .delete()
     }
+
+    func listenToPostsChange(completion: @escaping () -> Void) {
+        db
+            .collection("posts")
+            .addSnapshotListener { _, error in
+                completion()
+        }
+    }
 }
 
 // MARK: FireAuth
