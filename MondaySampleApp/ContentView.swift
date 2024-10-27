@@ -48,6 +48,11 @@ struct ContentView: View {
                     Text("アカウント削除")
                 }
             }
+            ToolbarItem(placement: .topBarLeading) {
+                Text(vm.userName)
+                    .font(.title3.bold())
+                    .foregroundStyle(Color.black)
+            }
         }
     }
 }

@@ -7,6 +7,7 @@ import Foundation
     // view logic    
     var message: String { get }
     var viewDataList: [ContentViewData] { get }
+    var userName: String { get }
 
     // tap logic
     func didTapPostButton() async
@@ -44,10 +45,8 @@ extension ContentViewModelImpl {
 extension ContentViewModelImpl {
     func viewDidAppear() async {
         await fetchPostList()
-        firebaseManager.listenToPostsChange {
-            Task { @MainActor in
-                await self.fetchPostList()
-            }
+        firebaseManager.listenToPostsChange { postList in
+            self.postListResponse = .success(postList)
         }
     }
 }
@@ -64,6 +63,10 @@ extension ContentViewModelImpl {
         case .failure, .none:
             return []
         }
+    }
+
+    var userName: String {
+        UserDefaults.standard.object(forKey: "userName") as? String ?? ""
     }
 
     private func makeViewData(_ post: Post) -> ContentViewData {

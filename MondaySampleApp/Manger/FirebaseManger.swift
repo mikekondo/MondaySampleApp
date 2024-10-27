@@ -48,11 +48,15 @@ extension FirebaseManager {
             .delete()
     }
 
-    func listenToPostsChange(completion: @escaping () -> Void) {
+    func listenToPostsChange(completion: @escaping ([Post]) -> Void) {
         db
             .collection("posts")
-            .addSnapshotListener { _, error in
-                completion()
+            .addSnapshotListener { querySnapShot, error in
+                guard let postDocuments = querySnapShot?.documents else { return }
+                let postList = postDocuments.compactMap {
+                    try? $0.data(as: Post.self)
+                }
+                completion(postList)
         }
     }
 }
