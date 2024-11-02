@@ -19,7 +19,7 @@ extension FirebaseManager {
     }
 
     /// Read
-    func readPosts() async throws -> [Post]{
+    func readPosts() async throws -> [Post] {
         let postDocuments = try await db
             .collection("posts")
             .getDocuments()
@@ -32,6 +32,7 @@ extension FirebaseManager {
     }
 
     /// Update
+    /// - Parameter post: 投稿データ
     func updatePost(post: Post) throws {
         guard let id = post.id else { return }
         try db
@@ -41,13 +42,16 @@ extension FirebaseManager {
     }
 
     /// Delete
-    func deletePost(id: String) {        
+    /// - Parameter id: 削除対象の投稿id
+    func deletePost(id: String) {
         db
             .collection("posts")
             .document(id)
             .delete()
     }
 
+    /// Firestoreの"posts"コレクションの変更を監視し、更新された投稿のリストを返します。
+    /// - Parameter completion: 更新された投稿リスト（`Post`オブジェクトの配列）を引数に取るクロージャ。コレクションの変更が発生した際に実行される。
     func listenToPostsChange(completion: @escaping ([Post]) -> Void) {
         db
             .collection("posts")

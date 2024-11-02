@@ -123,7 +123,8 @@ struct PostCellView<VM: ContentViewModel>: View {
                         Text("完了")
                             .font(.callout.bold())
                             .foregroundColor(.white)
-                            .padding()
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
                             .background(Color.blue)
                     }
                 }
