@@ -31,6 +31,18 @@ extension FirebaseManager {
         return postList
     }
 
+    /// Read
+    /// - Parameter id: 投稿id
+    func readPost(id: String) async throws -> Post {
+        let postDocument = try await db
+            .collection("posts")
+            .document(id)
+            .getDocument()
+
+        let post = try postDocument.data(as: Post.self)
+        return post
+    }
+
     /// Update
     /// - Parameter post: 投稿データ
     func updatePost(post: Post) throws {
